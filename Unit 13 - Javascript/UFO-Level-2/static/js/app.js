@@ -8,14 +8,13 @@ var tbody = d3.select('tbody');
 
 //Add a row for each UFO sighting
 tableData.forEach(function(ufoSighting) {
+
     //Append row
     var row = tbody.append('tr');
-
     Object.entries(ufoSighting).forEach(function([key, value]) {
-        
         console.log(key, value);
-        // Append a cell to the row for each value
 
+        // Append a cell to the row for each value
         var cell = row.append("td");
 
         //Populate the cells with the value from data
@@ -38,34 +37,44 @@ button.on('click', function() {
 
     //get the value property
     var valueDate = inputDate.property("value");
-    var valueCity = inputCity.property("value");
-    var valueState = inputState.property("value");
-    var valueCountry = inputCountry.property("value");
-    var valueShape = inputShape.property("value");
+    var valueCity = inputCity.property("value").toLowerCase();
+    var valueState = inputState.property("value").toLowerCase();
+    var valueCountry = inputCountry.property("value").toLowerCase();
+    var valueShape = inputShape.property("value").toLowerCase();
 
     //filter the data for sightings on that date
-    var filteredData = tableData.filter(sighting => sighting.datetime === valueDate)
-                                .filter(sighting => sighting.city === valueCity)
-                                .filter(sighting => sighting.state === valueState)
-                                .filter(sighting => sighting.country === valueCountry)
-                                .filter(sighting => sighting.shape === valueShape)
+    if(valueDate || valueCity || valueState || valueCountry || valueShape) {
+
+        let allValueArray = [["datetime", valueDate], ["city", valueCity], ["state", valueState], ["country", valueCountry], ["shape", valueShape]];
+        let existingArray = allValueArray.filter(value => value[1] !== "");
+        let filters = existingArray.map(arr => "sighting." + arr[0] + " == " + "'" + arr[1] + "'").join(" && ");
+
+        //var filteredData = tableData.filter(sighting => sighting.datetime === valueDate)
+        //                        .filter(sighting => sighting.city === valueCity)
+        //                        .filter(sighting => sighting.state === valueState)
+        //                        .filter(sighting => sighting.country === valueCountry)
+        //                        .filter(sighting => sighting.shape === valueShape)
+
+        filteredData = tableData.filter(sighting => eval(filters))
 
     //Add the data to the table using a forEach
-    filteredData.forEach(function(selections) {
+        filteredData.forEach(function(selections) {
 
-        console.log(selections);
+            console.log(selections);
         // Append one table row `tr` for each UFO Sighting object
-        var row = tbody.append("tr");
+            var row = tbody.append("tr");
 
         // Use `Object.entries` to console.log each UFO Sighting value
-        Object.entries(selections).forEach(function([key, value]) {
-            console.log(key, value);
+            Object.entries(selections).forEach(function([key, value]) {
+                console.log(key, value);
 
             // Append a cell to the row for each value
-            var cell = row.append("td");
-            cell.text(value);
+                var cell = row.append("td");
+                cell.text(value);
 
+            });
         });
-    });
+    }
+
 });
 
